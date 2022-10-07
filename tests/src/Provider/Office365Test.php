@@ -102,7 +102,8 @@ class Office365Test extends TestCase
     {
         $response = m::mock('Psr\Http\Message\ResponseInterface');
         $response->shouldReceive('getBody')->andReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
+            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
+            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
         );
         $response->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
 
@@ -130,14 +131,13 @@ class Office365Test extends TestCase
 
         $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
         $postResponse->shouldReceive('getBody')->andReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
+            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
+            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
         );
         $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
 
         $userResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $userResponse->shouldReceive('getBody')->andReturn(
-            '{"id": ' . $userId . ', "name": "' . $name . '", "first_name": "' . $firstname . '", "last_name": "' . $lastname . '", "emails": {"preferred": "' . $email . '"}, "link": "' . $urls . '"}'
-        );
+        $userResponse->shouldReceive('getBody')->andReturn('{"id": ' . $userId . '}');
         $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
 
         $client = m::mock('GuzzleHttp\ClientInterface');
@@ -159,7 +159,9 @@ class Office365Test extends TestCase
         $message = uniqid('', true);
 
         $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $postResponse->shouldReceive('getBody')->andReturn('{"error": {"code": "request_token_expired", "message": "' . $message . '"}}');
+        $postResponse->shouldReceive('getBody')->andReturn(
+            '{"error": {"code": "request_token_expired", "message": "' . $message . '"}}'
+        );
         $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
         $postResponse->shouldReceive('getStatusCode')->andReturn(500);
 

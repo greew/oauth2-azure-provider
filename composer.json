@@ -25,6 +25,7 @@
     }
   },
   "scripts": {
-    "test": "@php vendor/bin/phpunit"
+    "test": "@php vendor/bin/phpunit",
+    "codeStyle": "@php vendor/bin/phpcs"
   }
 }
