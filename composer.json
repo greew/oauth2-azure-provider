@@ -1,5 +1,6 @@
 {
   "name": "greew/oauth2-office365-provider",
+  "description": "An OAuth2 client provider for Office 365 to be used with thephpleague/oauth2-client",
   "license": "GPL-3.0-or-later",
   "require": {
     "php": "^7.3 || ^7.4 || ^8.0 || ^8.1",
