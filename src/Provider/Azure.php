@@ -87,7 +87,7 @@ class Azure extends AbstractProvider
     {
         if (isset($data['error'])) {
             throw new IdentityProviderException(
-                (isset($data['error']['message']) ? $data['error']['message'] : $response->getReasonPhrase()),
+                (isset($data['error_description']) ? $data['error_description'] : $response->getReasonPhrase()),
                 $response->getStatusCode(),
                 (string)$response->getBody()
             );
