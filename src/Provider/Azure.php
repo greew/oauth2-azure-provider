@@ -39,11 +39,10 @@ class Azure extends AbstractProvider
      * @param string $urlAuthorize Base url for authorization.
      */
     public function __construct(
-        array  $options = [],
-        array  $collaborators = [],
+        array $options = [],
+        array $collaborators = [],
         string $urlAuthorize = 'https://login.microsoftonline.com'
-    )
-    {
+    ) {
         $this->urlAuthorize = $urlAuthorize;
         parent::__construct($options, $collaborators);
     }
