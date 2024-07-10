@@ -31,19 +31,22 @@ class Azure extends AbstractProvider
     protected $urlAuthorize;
 
     /** @var string */
-    protected $urlResourceOwnerDetails = 'https://graph.microsoft.com/v1.0/me';
+    protected $urlResourceOwnerDetails;
 
     /**
      * @param array $options
      * @param array $collaborators
      * @param string $urlAuthorize Base url for authorization.
+     * @param string $urlResourceOwnerDetails
      */
     public function __construct(
         array $options = [],
         array $collaborators = [],
-        string $urlAuthorize = 'https://login.microsoftonline.com'
+        string $urlAuthorize = 'https://login.microsoftonline.com',
+        string $urlResourceOwnerDetails  = 'https://graph.microsoft.com/v1.0/me'
     ) {
         $this->urlAuthorize = $urlAuthorize;
+        $this->urlResourceOwnerDetails = $urlResourceOwnerDetails;
         parent::__construct($options, $collaborators);
     }
 
