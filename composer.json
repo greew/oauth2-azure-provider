@@ -27,6 +27,6 @@
   },
   "scripts": {
     "test": "@php vendor/bin/phpunit",
-    "style": "@php vendor/bin/php-cs-fixer fix"
+    "style": "@php vendor/bin/php-cs-fixer fix --config ./.php-cs-fixer.dist.php"
   }
 }
