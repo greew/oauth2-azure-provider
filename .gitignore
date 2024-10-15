@@ -6,3 +6,6 @@ vendor
 
 # No composer.lock for libraries
 composer.lock
+
+# No test and cache files
+.php-cs-fixer.cache
