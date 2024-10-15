@@ -48,7 +48,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run PHP Code Sniffer
-        run: composer run-script codeStyle
+        run: composer run-script style
 
       - name: Run test suite
         run: composer run-script test
