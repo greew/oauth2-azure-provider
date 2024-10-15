@@ -30,7 +30,6 @@ jobs:
           extensions: mbstring, intl
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug
-          tools: phpcs, phpunit:${{ matrix.phpunit-versions }}
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
@@ -49,6 +48,8 @@ jobs:
 
       - name: Run PHP Code Sniffer
         run: composer run-script style
+        only:
+          - ${{ matrix.php-versions == '7.4' }}
 
       - name: Run test suite
         run: composer run-script test
