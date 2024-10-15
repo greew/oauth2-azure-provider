@@ -87,7 +87,7 @@ class AzureTest extends TestCase
             'redirectUri' => 'none',
             'tenantId' => $customTenantId,
             'urlAuthorize' => $customAuthUrl,
-            'urlResourceOwnerDetails' => $customResourceOwnerUrl
+            'urlResourceOwnerDetails' => $customResourceOwnerUrl,
         ]);
 
         $authUrl = $this->provider->getAuthorizationUrl();
@@ -103,7 +103,7 @@ class AzureTest extends TestCase
         $response = m::mock('Psr\Http\Message\ResponseInterface');
         $response->shouldReceive('getBody')->andReturn(
             '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
-            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
+            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}',
         );
         $response->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
 
@@ -132,7 +132,7 @@ class AzureTest extends TestCase
         $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
         $postResponse->shouldReceive('getBody')->andReturn(
             '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
-            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
+            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}',
         );
         $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
 
@@ -160,7 +160,7 @@ class AzureTest extends TestCase
 
         $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
         $postResponse->shouldReceive('getBody')->andReturn(
-            '{"error": "request_token_expired", "error_description": "' . $message . '"}'
+            '{"error": "request_token_expired", "error_description": "' . $message . '"}',
         );
         $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
         $postResponse->shouldReceive('getStatusCode')->andReturn(500);
