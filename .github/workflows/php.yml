@@ -48,7 +48,7 @@ jobs:
 
       - name: Run PHP Code Sniffer
         run: composer run-script style
-        only:
+        if:
           - ${{ matrix.php-versions == '7.4' }}
 
       - name: Run test suite
