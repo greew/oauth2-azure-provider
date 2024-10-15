@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Greew\OAuth2\Test\Client\Provider;
 
 use Greew\OAuth2\Client\Provider\Azure;
+use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\QueryBuilderTrait;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class AzureTest extends TestCase
 {
@@ -27,7 +29,6 @@ class AzureTest extends TestCase
 
     public function tearDown(): void
     {
-        m::close();
         parent::tearDown();
     }
 
@@ -79,7 +80,7 @@ class AzureTest extends TestCase
         $customAuthUrl = uniqid('', true);
         $customResourceOwnerUrl = uniqid('', true);
         $customTenantId = uniqid('', true);
-        $token = m::mock('League\OAuth2\Client\Token\AccessToken');
+        $token = $this->createMock(AccessToken::class);
 
         $this->provider = new Azure([
             'clientId' => 'mock_client_id',
@@ -87,7 +88,7 @@ class AzureTest extends TestCase
             'redirectUri' => 'none',
             'tenantId' => $customTenantId,
             'urlAuthorize' => $customAuthUrl,
-            'urlResourceOwnerDetails' => $customResourceOwnerUrl
+            'urlResourceOwnerDetails' => $customResourceOwnerUrl,
         ]);
 
         $authUrl = $this->provider->getAuthorizationUrl();
@@ -100,15 +101,20 @@ class AzureTest extends TestCase
 
     public function testGetAccessToken(): void
     {
-        $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $response->shouldReceive('getBody')->andReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
-            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
-        );
-        $response->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $streamInterface = $this->createMock(StreamInterface::class);
+        $streamInterface
+            ->method('__toString')
+            ->willReturn('{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}');
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')->times(1)->andReturn($response);
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getBody')->willReturn($streamInterface);
+        $response->method('getHeader')->willReturn(['content-type' => 'json']);
+
+        $client = $this->createMock('GuzzleHttp\ClientInterface');
+        $client
+            ->expects($this->once())
+            ->method('send')
+            ->willReturn($response);
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
@@ -122,28 +128,32 @@ class AzureTest extends TestCase
 
     public function testUserData(): void
     {
-        $email = uniqid('', true);
-        $firstname = uniqid('', true);
-        $lastname = uniqid('', true);
-        $name = uniqid('', true);
         $userId = rand(1000, 9999);
-        $urls = uniqid('', true);
 
-        $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $postResponse->shouldReceive('getBody')->andReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,' .
-            '"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
-        );
-        $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $postResponseStreamInterface = $this->createMock(StreamInterface::class);
+        $postResponseStreamInterface
+            ->method('__toString')
+            ->willReturn('{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}');
 
-        $userResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $userResponse->shouldReceive('getBody')->andReturn('{"id": ' . $userId . '}');
-        $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $postResponse = $this->createMock(ResponseInterface::class);
+        $postResponse->method('getBody')->willReturn($postResponseStreamInterface);
+        $postResponse->method('getHeader')->willReturn(['content-type' => 'json']);
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')
-            ->times(2)
-            ->andReturn($postResponse, $userResponse);
+        $userResponseStreamInterface = $this->createMock(StreamInterface::class);
+        $userResponseStreamInterface
+            ->method('__toString')
+            ->willReturn('{"id": ' . $userId . '}');
+
+        $userResponse = $this->createMock(ResponseInterface::class);
+        $userResponse->method('getBody')->willReturn($userResponseStreamInterface);
+        $userResponse->method('getHeader')->willReturn(['content-type' => 'json']);
+
+        $client = $this->createMock('GuzzleHttp\ClientInterface');
+        $client
+            ->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnOnConsecutiveCalls($postResponse, $userResponse);
+
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
@@ -158,17 +168,29 @@ class AzureTest extends TestCase
         $this->expectException(\League\OAuth2\Client\Provider\Exception\IdentityProviderException::class);
         $message = uniqid('', true);
 
-        $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $postResponse->shouldReceive('getBody')->andReturn(
-            '{"error": "request_token_expired", "error_description": "' . $message . '"}'
-        );
-        $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
-        $postResponse->shouldReceive('getStatusCode')->andReturn(500);
+        $postResponseStreamInterface = $this->createMock(StreamInterface::class);
+        $postResponseStreamInterface
+            ->method('__toString')
+            ->willReturn('{"error": "invalid_grant", "error_description": "' . $message . '"}');
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')
-            ->times(1)
-            ->andReturn($postResponse);
+        $postResponse = $this->createMock(ResponseInterface::class);
+        $postResponse
+            ->method('getBody')
+            ->willReturn($postResponseStreamInterface);
+
+        $postResponse
+            ->method('getHeader')
+            ->willReturn(['content-type' => 'json']);
+
+        $postResponse
+            ->method('getStatusCode')
+            ->willReturn(400);
+
+        $client = $this->createMock('GuzzleHttp\ClientInterface');
+        $client
+            ->expects($this->once())
+            ->method('send')
+            ->willReturn($postResponse);
         $this->provider->setHttpClient($client);
 
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);

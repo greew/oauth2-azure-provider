@@ -20,7 +20,7 @@ class Azure extends AbstractProvider
      */
     public $defaultScopes = [
         'https://outlook.office.com/SMTP.Send',
-        'offline_access'
+        'offline_access',
     ];
 
     /**
@@ -106,7 +106,7 @@ class Azure extends AbstractProvider
             throw new IdentityProviderException(
                 (isset($data['error_description']) ? $data['error_description'] : $response->getReasonPhrase()),
                 $response->getStatusCode(),
-                (string)$response->getBody()
+                (string) $response->getBody(),
             );
         }
     }
@@ -134,7 +134,7 @@ class Azure extends AbstractProvider
     {
         $uri = new Uri($this->urlResourceOwnerDetails);
 
-        return (string)Uri::withQueryValue($uri, 'access_token', (string)$token);
+        return (string) Uri::withQueryValue($uri, 'access_token', (string) $token);
     }
 
     protected function getScopeSeparator()
