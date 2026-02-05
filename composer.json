@@ -2,7 +2,7 @@
   "name": "greew/oauth2-azure-provider",
   "description": "An OAuth2 client provider for Microsoft Azure to be used with thephpleague/oauth2-client",
   "type": "library",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "require": {
     "php": "^7.3 || ^8.0",
     "league/oauth2-client": "^2.6",
